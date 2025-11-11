@@ -25,8 +25,24 @@
 docker build -t lr-completions .
 ```
 
-3. Run the script:
+3. Run the data save script:
+
+This script will store course, organisation and last completion data from the database as a .pkl (Pickle) file to save time during the main script:
+
+```sh
+docker run -it --rm -v $PWD/src:/app -w /app lr-completions python save_data.py
+```
+
+3. Run the main script:
 
 ```sh
 docker run -it --rm -v $PWD/src:/app -w /app lr-completions python main.py
+```
+
+This script will create a `plan.json` file in the `data` directory.
+
+To keep track of the logs while the main script is running run:
+
+```sh
+tail -f src/debug.log
 ```

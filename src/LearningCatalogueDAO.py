@@ -12,6 +12,3 @@ es = Elasticsearch(
 def get_all_courses():
     results = es.search(index="courses", body={"query": {"match_all": {}}}, size=10000)["hits"]["hits"]
     return [result["_source"] for result in results]
-
-def get_course(course_id):
-    return es.get(index="courses", id=course_id)["_source"]
