@@ -38,10 +38,18 @@ def insert_course_completion_events(events):
     cursor = connection.cursor()
     for event in events:
         completion_date = event["event_timestamp"]
-        create_partition_query = f"""CREATE TABLE IF NOT EXISTS course_completion_events_{DateUtil.get_date_partition_name(completion_date)} PARTITION OF course_completion_events
+        create_partition_query = f"""CREATE TABLE IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)} PARTITION OF course_completion_events
             FOR VALUES FROM ('{DateUtil.get_partition_dates(completion_date)["start_date"]}') TO ('{DateUtil.get_partition_dates(completion_date)["end_date"]}');"""
         cursor.execute(create_partition_query)
+
+        create_index_query = f"""CREATE INDEX IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)}_course_id_idx ON {DateUtil.get_date_partition_name(completion_date)} (course_id);
+        CREATE INDEX IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)}_event_timestamp_idx ON {DateUtil.get_date_partition_name(completion_date)} (event_timestamp);
+        CREATE INDEX IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)}_grade_id_idx ON {DateUtil.get_date_partition_name(completion_date)} (grade_id);
+        CREATE INDEX IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)}_organisation_id_idx ON {DateUtil.get_date_partition_name(completion_date)} (organisation_id);
+        CREATE INDEX IF NOT EXISTS {DateUtil.get_date_partition_name(completion_date)}_profession_id_idx ON {DateUtil.get_date_partition_name(completion_date)} (profession_id);"""
     
+        cursor.execute(create_index_query)
+        
     insert_query = f"""INSERT INTO course_completion_events 
         (external_id, user_id, user_email, course_id, course_title, event_timestamp, organisation_id, profession_id, grade_id, grade_name, profession_name, organisation_name) 
         VALUES 

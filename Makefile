@@ -12,6 +12,9 @@ save-data:
 save-data-replace:
 	$(docker) python save_data.py --replace
 
+down:
+	docker compose down
+
 plan:
 	$(docker) python plan.py
 
