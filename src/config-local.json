@@ -1,0 +1,17 @@
+{
+    "elasticsearch": {
+        "host": "elasticsearch",
+        "username": "elastic",
+        "password": "password1"
+    },
+    "mysql": {
+        "host": "mysql",
+        "username": "root",
+        "password": "password1"
+    },
+    "postgres": {
+        "host": "postgres",
+        "username": "reporting",
+        "password": "password1"
+    }
+}

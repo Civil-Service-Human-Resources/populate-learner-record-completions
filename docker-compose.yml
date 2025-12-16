@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./src:/app
+    command: ["tail", "-f"]
+
+  mysql:
+    image: mysql:8.0.44
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password1
+    restart: always
+
+  
+
+  postgres:
+    image: postgres:16.10
+    environment:
+      POSTGRES_USER: reporting
+      POSTGRES_PASSWORD: password1
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  dbdata:

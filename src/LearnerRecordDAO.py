@@ -25,17 +25,9 @@ def get_required_module_completions_for_user_and_course(user_id, course_id, star
     cursor.close()
     return result
 
-def get_module_record(user_id, course_id):
+def get_last_mandatory_module_completions(from_date, to_date=datetime.now().strftime("%Y-%m-%d %H:%M")):
     cursor = db.cursor()
-    query = "SELECT * FROM learner_record.module_record WHERE user_id = %s AND course_id = %s"
-    cursor.execute(query, (user_id, course_id,))
-    result = cursor.fetchall()
-    cursor.close()
-    return result
-
-def get_last_mandatory_module_completions(from_date, to_date=datetime.now().strftime("%Y-%m-%d")):
-    cursor = db.cursor()
-    query = """select mr.user_id, ou.code, mr.course_id, max(mr.completion_date) as last_completion_date from learner_record.module_record mr
+    query = """select mr.user_id, ou.code, mr.course_id, max(mr.completion_date)as last_completion_date, mr.created_at from learner_record.module_record mr
         join csrs.`identity` i on i.uid = mr.user_id
         join csrs.civil_servant cs on cs.identity_id = i.id
         join csrs.organisational_unit ou on ou.id = cs.organisational_unit_id
@@ -59,24 +51,45 @@ def get_course_completion_events(user_id, course_id, from_date):
     cursor.close()
     return result
 
-def get_incomplete_course_completion_records(course_id, start_of_learning_period, number_of_mandatory_modules_in_course, course_completion_date_from):
-    cursor = db.cursor()
-    query = """select learner_id, resource_id from learner_record.learner_records lr
-            left join learner_record.learner_record_events lre on lre.learner_record_id = lr.id
-            where lre.id is null
-            and lr.resource_id = %s
-            and lr.learner_id in (select data.user_id  from (
-            select mr.user_id, count(state) as completed_courses, max(mr.completion_date) as last_completed from learner_record.module_record mr 
-                where mr.course_id = %s
-                and state = 'COMPLETED'
-                and optional = 0
-                and mr.completion_date >= %s
-                group by mr.user_id
-        ) as data
-        where data.completed_courses = %s
-        and data.last_completed >= %s)
-        order by lr.created_timestamp desc;"""
-    cursor.execute(query, (course_id, course_id, start_of_learning_period, number_of_mandatory_modules_in_course, course_completion_date_from,))
-    result = cursor.fetchall()
-    cursor.close()
-    return result
+def insert_learner_record_events_in_batches(rows, batch_size=100):
+    select_statement = "select lr.id,4,1,%s from learner_record.learner_records lr where lr.learner_id = %s and lr.resource_id = %s"
+
+    batch_start_index = list(range(0, len(rows), batch_size))
+
+    apply_results = []
+    
+    for start_index in batch_start_index:
+        row_batch = rows[start_index : start_index + batch_size]
+        cursor = db.cursor()
+        params = []
+        try:
+            for row in row_batch:
+                
+                learner_id = row["learner_id"]
+                resource_id = row["resource_id"]
+                event_timestamp = row["event_timestamp"]
+                params.extend([event_timestamp, learner_id, resource_id])
+
+            select_statements = " union all ".join([select_statement] * len(row_batch))
+
+            sql_query = f"""insert into learner_record.learner_record_events 
+                (learner_record_id, learner_record_event_type, learner_record_event_source, event_timestamp)
+                {select_statements};"""
+            
+            cursor.execute(sql_query, params)
+            db.commit()
+            applied_successfully = True
+        except mysql.connector.Error as err:
+            print("Error: {}".format(err))
+            db.rollback()
+            applied_successfully = False
+        finally:
+            cursor.close()
+
+        apply_results.append({
+            "applied_successfully": applied_successfully,
+            "start_index": start_index,
+            "end_index": start_index + batch_size - 1
+        })
+
+    return apply_results

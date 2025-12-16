@@ -1,6 +1,6 @@
 # Script to populate learner record completions
 
-## Set up
+## Setup and run
 
 1. Create a `config.json` file in the `src` directory containing the database credentials:
 
@@ -15,6 +15,11 @@
         "host": "hostname", // Protocol and host are NOT needed here.
         "username": "username",
         "password": "password"
+    },
+    "postgres": {
+        "host": "hostname", // Protocol and host are NOT needed here.
+        "username": "username",
+        "password": "password"
     }
 }
 ```
@@ -22,7 +27,13 @@
 2. Build the Docker image from the Dockerfile:
 
 ```sh
-docker build -t lr-completions .
+make setup
+```
+
+Or if your OS doesn't support `make`:
+
+```sh
+docker compose up -d --build
 ```
 
 3. Run the data save script:
@@ -30,19 +41,59 @@ docker build -t lr-completions .
 This script will store course, organisation and last completion data from the database as a .pkl (Pickle) file to save time during the main script:
 
 ```sh
-docker run -it --rm -v $PWD/src:/app -w /app lr-completions python save_data.py
+make save-data
 ```
 
-3. Run the main script:
+Or, if you can't use `make`: 
+
+```
+docker compose exec app python save_data.py
+```
+
+This will create a `data` directory with the necessary data.
+
+**Note:** If a `data` directory already exists, this will show you an error. To override it, use these commands instead:
 
 ```sh
-docker run -it --rm -v $PWD/src:/app -w /app lr-completions python main.py
+make save-data-replace
+# Or
+docker compose exec app python save_data.py --replace
 ```
 
-This script will create a `plan.json` file in the `data` directory.
+3. Run the *plan* script:
+
+```sh
+make plan
+# or
+docker compose exec app python plan.py
+```
+
+This script will take a few hours and will create a `plan.json` file in the `data` directory.
 
 To keep track of the logs while the main script is running run:
 
 ```sh
 tail -f src/debug.log
 ```
+
+## Run analytics
+
+### Incomplete records by month
+
+```sh
+make analytics.byMonth
+# Or
+docker compose exec app python -m analytics.byMonth
+```
+
+### Incomplete records by course
+
+```sh
+make analytics.byCourse
+# Or
+docker compose exec app python -m analytics.byCourse
+```
+
+## Test locally
+
+To test using local databases, head to the `config.py` file and replace `config.json` with `config-local.json`.

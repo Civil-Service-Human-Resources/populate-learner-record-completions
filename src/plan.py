@@ -5,6 +5,8 @@ import json
 from datetime import datetime
 import logging
 import CsrsService
+import os
+import math
 
 logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
@@ -17,11 +19,19 @@ logging.debug(f"Loaded {len(courses)} courses.")
 
 incomplete_completion_records = []
 
-for record in module_records:
+for (index,record) in enumerate(module_records):
+    _ = os.system("clear")
+    percentage_completed = str(math.floor((index/len(module_records))*100))
+    print(f"Processing {index+1} of {len(module_records)} ({percentage_completed}%)")
+    print(f"Incomplete records found: {len(incomplete_completion_records)}")
+    print()
+    os.system("tail -n20 debug.log")
+
     user_id = record[0]
     organisation_code = record[1]
     course_id = record[2]
     last_module_completion_date = record[3]
+    created_at = record[4]
 
     logging.debug(f"Processing user_id: {user_id}, organisation_code: {organisation_code}, course_id: {course_id}, last completion date: {last_module_completion_date}")
 
@@ -78,7 +88,7 @@ for record in module_records:
     logging.debug(f" - {len(completion_events)} completion events found.")
 
     if len(completion_events) > 0:
-        logging.debug(f" - ✅ Completion event exists for user_id {user_id} in course_id {course_id}. No change required")
+        logging.debug(f" - Completion event exists for user_id {user_id} in course_id {course_id}. No change required")
         continue
 
     logging.debug(f" - 🟡 No completion event found for user_id {user_id} in course_id {course_id}. Marking as incomplete.")
@@ -86,7 +96,8 @@ for record in module_records:
     incomplete_completion_records.append({
         "user_id": user_id,
         "course_id": course_id,
-        "completion_timestamp": datetime.strftime(record[3], "%Y-%m-%dT%H:%M:%S")
+        "completion_timestamp": datetime.strftime(last_module_completion_date, "%Y-%m-%dT%H:%M:%S"),
+        "created_at": datetime.strftime(created_at, "%Y-%m-%dT%H:%M:%S")
     })
             
 logging.debug(f"Total incomplete completion records found: {len(incomplete_completion_records)}")
