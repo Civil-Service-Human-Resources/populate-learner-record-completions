@@ -94,6 +94,8 @@ make analytics.byCourse
 docker compose exec app python -m analytics.byCourse
 ```
 
-## Test locally
+## Set environment config
 
-To test using local databases, head to the `config.py` file and replace `config.json` with `config-local.json`.
+To test the script locally, set the config file in `config.py` to `config-local.json` (default).
+
+To run the script in production, change it to `config.json`.
