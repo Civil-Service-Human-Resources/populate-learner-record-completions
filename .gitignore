@@ -3,4 +3,4 @@ __pycache__/
 data/
 *.log
 logs/
-.DS_Store/
+.DS_Store
