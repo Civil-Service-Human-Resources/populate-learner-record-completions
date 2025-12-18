@@ -6,7 +6,6 @@ import ReportingDAO
 import uuid
 
 plan_data = json.load(open("data/plan.json", "r"))
-learner_details = pickle.load(open("data/learner_details.pkl", "rb"))
 courses = pickle.load(open("data/courses.pkl", "rb"))
 
 event_rows = [{
@@ -21,7 +20,7 @@ json.dump(apply_results, open("data/apply.json", "w"), indent=4)
 course_completion_events_rows = []
 
 for item in plan_data:
-	learner = next((ld for ld in learner_details if ld[0] == item['user_id']), None)
+	learner = ReportingDAO.get_learner_details(item["user_id"], item["completion_timestamp"])
 	
 	if learner is not None:
 		course_completion_events_rows.append({

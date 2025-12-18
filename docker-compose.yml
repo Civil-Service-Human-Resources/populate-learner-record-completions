@@ -5,6 +5,8 @@ services:
     volumes:
       - ./src:/app
     command: ["tail", "-f"]
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
 
   mysql:
     image: mysql:8.0.44

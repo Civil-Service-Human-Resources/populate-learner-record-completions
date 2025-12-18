@@ -36,6 +36,12 @@ Or if your OS doesn't support `make`:
 docker compose up -d --build
 ```
 
+If you're planning to run the scripts in production, add `ENVIRONMENT=PROD` before. For example:
+
+```sh
+ENVIRONMENT=PROD make setup
+```
+
 3. Run the data save script:
 
 This script will store course, organisation and last completion data from the database as a .pkl (Pickle) file to save time during the main script:

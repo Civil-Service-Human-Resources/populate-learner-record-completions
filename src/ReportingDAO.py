@@ -1,11 +1,8 @@
 import psycopg
 import config
-import uuid
 import DateUtil
 
 pg_config = config.get_config()["postgres"]
-
-print(pg_config)
 
 connection = psycopg.connect(
     dbname="reporting",
@@ -14,25 +11,43 @@ connection = psycopg.connect(
     host=pg_config["host"]
 )
 
-def get_learners_details(learner_ids):
-    sql_query = """select 
+def get_learner_details_around_date(learner_id, date, interval = '1 month'):
+    sql_query = f"""select 
         cce.user_id, 
-        max(cce.user_email) as user_email,  
-        max(cce.organisation_id) as organisation_id,
-        max(cce.organisation_name) as organisation_name,
-        max(cce.profession_id) as profession_id,
-        max(cce.profession_name) as profession_name,
-        max(cce.grade_id) as grade_id,
-        max(cce.grade_name) as grade_name
+        cce.user_email as user_email,  
+        cce.organisation_id as organisation_id,
+        cce.organisation_name as organisation_name,
+        cce.profession_id as profession_id,
+        cce.profession_name as profession_name,
+        cce.grade_id as grade_id,
+        cce.grade_name as grade_name,
+        cce.event_timestamp
         from course_completion_events cce 
-        where cce.user_id = any(%s)
-        group by cce.user_id;""";
+        where cce.user_id = %s
+        AND cce.event_timestamp BETWEEN %s - INTERVAL '{interval}'
+            AND %s + INTERVAL '{interval}'
+        and cce.event_timestamp != %s
+        order by cce.event_timestamp desc
+        limit 1;""";
     
     cursor = connection.cursor()
-    cursor.execute(sql_query, (learner_ids,))
-    result = cursor.fetchall()
+    dt = DateUtil.get_as_datetime(date)
+    cursor.execute(sql_query, (learner_id, dt, dt, dt,))
+    result = cursor.fetchone()
     cursor.close()
     return result
+
+def get_learner_details(learner_id: str, date: str = DateUtil.get_date_now_as_string()):
+    intervals = ['1 month', '2 months', '3 months', '1 year', '10 years']
+    
+    learner = None
+
+    for interval in intervals:
+        learner = get_learner_details_around_date(learner_id, date, interval)
+        if learner is not None:
+            break
+
+    return learner
     
 def insert_course_completion_events(events):
     cursor = connection.cursor()

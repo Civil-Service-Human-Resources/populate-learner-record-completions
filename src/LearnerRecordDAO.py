@@ -89,7 +89,8 @@ def insert_learner_record_events_in_batches(rows, batch_size=100):
         apply_results.append({
             "applied_successfully": applied_successfully,
             "start_index": start_index,
-            "end_index": start_index + batch_size - 1
+            "end_index": start_index + batch_size - 1,
+            "first_entry_id": cursor.lastrowid if applied_successfully else None
         })
 
     return apply_results

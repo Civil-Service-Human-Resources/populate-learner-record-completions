@@ -13,3 +13,9 @@ def get_partition_dates(date_str):
         "start_date": start_date,
         "end_date": end_date
     }
+
+def get_as_datetime(date_str):
+    return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+
+def get_date_now_as_string():
+    return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

@@ -5,9 +5,10 @@ import CsrsDAO
 import os
 import sys
 import shutil
-import ReportingDAO
 
+# Define the date range:
 start_date = '2025-04-01 00:00:00'
+end_date = '2025-12-31 23:59:59'
 
 arguments = sys.argv[1:]
 
@@ -25,14 +26,10 @@ courses = LearningCatalogueDAO.get_all_courses()
 pickle.dump(courses, open("data/courses.pkl", "wb"))
 print(f"Saved {len(courses)} courses")
 
-last_mandatory_module_completions = LearnerRecordDAO.get_last_mandatory_module_completions(from_date=start_date)
+last_mandatory_module_completions = LearnerRecordDAO.get_last_mandatory_module_completions(from_date=start_date, to_date=end_date)
 pickle.dump(last_mandatory_module_completions, open("data/last_mandatory_module_completions.pkl", "wb"))
 print(f"Saved {len(last_mandatory_module_completions)} module completions")
 
 organisations = CsrsDAO.get_all_organisations()
 pickle.dump(organisations, open("data/organisations.pkl", "wb"))
 print(f"Saved {len(organisations)} organisations")
-
-learner_details = ReportingDAO.get_learners_details(list(set([c[0] for c in last_mandatory_module_completions])))
-pickle.dump(learner_details, open("data/learner_details.pkl", "wb"))
-print(f"Saved {len(learner_details)} learner details")
