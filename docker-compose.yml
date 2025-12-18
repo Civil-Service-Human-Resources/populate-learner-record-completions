@@ -4,6 +4,7 @@ services:
     working_dir: /app
     volumes:
       - ./src:/app
+      - ./logs:/logs
     command: ["tail", "-f"]
     environment:
       - ENVIRONMENT=${ENVIRONMENT}

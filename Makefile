@@ -2,6 +2,10 @@ docker := docker compose exec app
 
 setup:
 	docker compose up -d --build
+	make config
+
+config:
+	$(docker) python setup_prod_config.py
 
 container:
 	$(docker) bash 

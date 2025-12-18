@@ -8,7 +8,7 @@ import CsrsService
 import os
 import math
 
-logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
 
 module_records = pickle.load(open("data/last_mandatory_module_completions.pkl", "rb"))
 
@@ -24,8 +24,6 @@ for (index,record) in enumerate(module_records):
     percentage_completed = str(math.floor((index/len(module_records))*100))
     print(f"Processing {index+1} of {len(module_records)} ({percentage_completed}%)")
     print(f"Incomplete records found: {len(incomplete_completion_records)}")
-    print()
-    os.system("tail -n20 debug.log")
 
     user_id = record[0]
     organisation_code = record[1]
