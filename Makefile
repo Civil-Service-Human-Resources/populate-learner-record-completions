@@ -1,32 +1,62 @@
 docker := docker compose exec app
 
+## Setup
 setup:
 	docker compose up -d --build
-	make config
+
+## Environment
+
+env-set-local:
+	ENVIRONMENT="LOCAL" make setup
+
+env-set-prod:
+	ENVIRONMENT="PROD" make setup
+
+env-check:
+	$(docker) env | grep ENVIRONMENT
+
+# Config
 
 config:
-	$(docker) python setup_prod_config.py
+	$(docker) python -m actions.setup_prod_config
+
+# Container
 
 container:
 	$(docker) bash 
 
-save-data:
-	$(docker) python save_data.py
-
-save-data-replace:
-	$(docker) python save_data.py --replace
-
 down:
 	docker compose down
 
+# Actions
+
+save-data:
+	$(docker) python -m actions.save_data
+
+save-data-replace:
+	$(docker) python -m actions.save_data --replace
+
 plan:
-	$(docker) python plan.py
+	$(docker) python -m actions.plan
 
 apply:
-	$(docker) python apply.py
+	$(docker) python -m actions.apply
+
+revert:
+	$(docker) python -m actions.revert
+
+# Logs
+
+logs:
+	tail -f logs/debug.log
+
+# Analytics
 	
 analytics.byMonth:
 	$(docker) python -m analytics.byMonth
 
 analytics.byCourse:
 	$(docker) python -m analytics.byCourse
+
+analytics.html:
+	$(docker) python -m analytics.htmlReport

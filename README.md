@@ -26,8 +26,8 @@ ENVIRONMENT=PROD docker compose up -d --build
 Run this command to find the incomplete records:
 
 ```sh
-docker compose exec app python save_data.py
-docker compose exec app python plan.py
+docker compose exec app python -m actions.save_data
+docker compose exec app python -m actions.plan
 ```
 
 *Note: If there's already a `data` directory, this will stop. If you want to replace the data, use `docker compose exec app python save_data.py --replace` instead.*
@@ -37,7 +37,7 @@ This will store some necessary data from the databases, to make the script more 
 Once you are happy and ready, run this command to insert the new data in the event completions table:
 
 ```sh
-docker compose exec app python apply.py
+docker compose exec app python -m actions.apply
 ```
 
 ## Analytics

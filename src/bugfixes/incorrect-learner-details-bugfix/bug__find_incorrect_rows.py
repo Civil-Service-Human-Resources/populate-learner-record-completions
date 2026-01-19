@@ -1,5 +1,5 @@
 import json
-import ReportingDAO
+import modules.reporting.ReportingDAO as ReportingDAO
 
 reporting = json.load(open('data/reporting.json'))
 

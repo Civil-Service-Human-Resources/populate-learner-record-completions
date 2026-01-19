@@ -1,6 +1,25 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+def get_learning_period_for_date(target_date: str, required_by: str, frequency: str = None):
+    required_by_date = datetime.strptime(required_by, "%Y-%m-%dT%H:%M:%S")
+    target_date = datetime.strptime(target_date, "%Y-%m-%dT%H:%M:%S")
+
+    if frequency is None:
+        return datetime.fromtimestamp(0)
+
+    frequency_period = get_years_and_months_from_frequency(frequency)
+    while required_by_date < target_date:
+        required_by_date += relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+
+    required_by_date += relativedelta(minutes=1)
+    learning_period_start_date = required_by_date - relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+
+    return {
+        "start_date": learning_period_start_date,
+        "end_date": required_by_date - relativedelta(minutes=1)
+    }
+
 def get_current_learning_period(required_by: str, frequency: str = None):
     required_by_date = datetime.strptime(required_by, "%Y-%m-%dT%H:%M:%S")
 

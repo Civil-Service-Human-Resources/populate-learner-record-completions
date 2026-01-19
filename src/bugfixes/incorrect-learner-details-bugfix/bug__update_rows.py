@@ -1,8 +1,8 @@
 import json
 import psycopg
-import config
+import modules.config.ConfigService as ConfigService
 
-postgres_config = config.get_config()["postgres"]
+postgres_config = ConfigService.get_config()["postgres"]
 
 connection = psycopg.connect(
     dbname="reporting",

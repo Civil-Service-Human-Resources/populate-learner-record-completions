@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch
-import config
+import modules.config.ConfigService as ConfigService
 
-elasticsearch_config = config.get_config()["elasticsearch"]
+elasticsearch_config = ConfigService.get_config()["elasticsearch"]
 
 es = Elasticsearch(
     elasticsearch_config["host"],

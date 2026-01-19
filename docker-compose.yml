@@ -5,6 +5,8 @@ services:
     volumes:
       - ./src:/app
       - ./logs:/logs
+      - ./data:/app-data
+      - ./config:/config
     command: ["tail", "-f"]
     environment:
       - ENVIRONMENT=${ENVIRONMENT}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incomplete records</title>
+    <style>
+      *{
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      body{
+        width: 1200px;
+        margin: auto
+      }
+
+      h1, h2 {
+        margin-top: 40px;
+        margin-bottom: 20px;
+      }
+
+      table, table tr th, table tr td {
+        border: 0;
+      }
+
+      table tr th{
+        text-align: left;
+        padding: 8px;
+        background-color: #999;
+        color: white;
+      }
+
+      table tr td{
+        padding: 8px;
+      }
+
+      table tr:nth-child(odd){
+        background-color: #f9f9f9;
+      }
+
+      #total_records {
+        font-weight: bold;
+      }
+    </style>
+</head>
+<body>
+    <h1>Incomplete records</h1>
+
+    <div>Total incomplete records: <span id="total_records">{{total_records}}</span></div>
+
+    <h2>By month</h2>
+
+    {{by_month_table}}
+
+    <h2>By course</h2>
+
+    {{by_course_table}}
+
+</body>
+</html>

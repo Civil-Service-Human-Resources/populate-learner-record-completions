@@ -4,8 +4,8 @@ import json
 print("CONFIGURATION FOR PRODUCTION ENVIRONMENT")
 print()
 
-if os.path.exists("config.json"):
-    print("Configuration file (config.json) already exists.")
+if os.path.exists("/config/config.json"):
+    print("Configuration file (/config/config.json) already exists.")
     response = input("Do you want to replace it? (Y/n): ")
     if response != "Y":
         exit(1)
@@ -52,6 +52,6 @@ print()
 response = input("Happy with the configuration? (Y/n): ")
 
 if response == "Y":
-    with open("config.json", "w") as f:
+    with open("/config/config.json", "w") as f:
         json.dump(config, f, indent=4)
     print("Configuration saved to config.json")

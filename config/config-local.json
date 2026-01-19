@@ -12,6 +12,7 @@
     "postgres": {
         "host": "postgres",
         "username": "reporting",
-        "password": "password1"
+        "password": "password1",
+        "database": "reporting"
     }
 }
