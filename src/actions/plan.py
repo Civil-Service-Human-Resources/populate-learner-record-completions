@@ -4,11 +4,9 @@ import modules.learnerRecord.LearnerRecordDAO as LearnerRecordDAO
 import json
 from datetime import datetime
 import logging
-import modules.csrs.CsrsService as CsrsService
 import os
 import math
 import modules.learner.LearnerService as LearnerService
-import modules.database.PostgresConnection as PostgresConnection
 import modules.audience.AudienceService as AudienceService
 
 logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
@@ -37,9 +35,6 @@ for (index,record) in enumerate(module_records):
     learner_details = LearnerService.get_learner_details(user_id, last_module_completion_date.strftime("%Y-%m-%dT%H:%M:%S"))
 
     logging.debug(f"Processing user_id: {user_id}, organisation_code: {organisation_code}, course_id: {course_id}, last completion date: {last_module_completion_date}")
-
-    organisation_hierarchy = CsrsService.get_organisation_hierarchy(organisation_code)
-    logging.debug(f" - Organisation hierarchy for code {organisation_code}: {organisation_hierarchy}")
     
     course = next((course for course in courses if course["id"] == course_id), None)
     logging.debug(f" - Course for course_id {course_id}: {course["title"] if course else 'Not Found'}")
@@ -103,7 +98,6 @@ for (index,record) in enumerate(module_records):
     logging.debug(f" - 🟡 No completion event found for user_id {user_id} in course_id {course_id}. Marking as incomplete.")
 
     logging.debug(f" - Fetching historical learner details for user_id: {user_id} as of date: {last_module_completion_date}...")
-    
 
     record = {
         "user_id": user_id,

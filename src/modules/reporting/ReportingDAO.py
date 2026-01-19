@@ -1,6 +1,37 @@
 import modules.utils.DateUtil as DateUtil
 import modules.database.PostgresConnection as PostgresConnection
 
+def get_completions_for_learners(learner_ids, start_date, end_date):
+    with PostgresConnection.get_connection() as connection:
+        with connection.cursor() as cursor:
+            tmp_user_ids_query = """CREATE TEMP TABLE tmp_user_ids (
+                    user_id text
+                ) ON COMMIT DROP;"""
+            
+            cursor.execute(tmp_user_ids_query)
+
+            with cursor.copy("COPY tmp_user_ids (user_id) FROM STDIN") as copy:
+                for learner_id in learner_ids:
+                    copy.write_row((learner_id,))
+
+            query = """SELECT
+                    cce.user_id as user_id,
+                    cce.user_email as user_email,  
+                    cce.organisation_id as organisation_id,
+                    cce.organisation_name as organisation_name,
+                    cce.profession_id as profession_id,
+                    cce.profession_name as profession_name,
+                    cce.grade_id as grade_id,
+                    cce.grade_name as grade_name,
+                    cce.event_timestamp as event_timestamp
+                FROM course_completion_events cce
+                JOIN tmp_user_ids t USING (user_id)
+                WHERE cce.event_timestamp BETWEEN %s - INTERVAL '1 year' AND %s + INTERVAL '1 year';"""
+            cursor.execute(query, (DateUtil.get_as_datetime(start_date), DateUtil.get_as_datetime(end_date)))
+
+            for user_id, user_email, organisation_id, organisation_name, profession_id, profession_name, grade_id, grade_name, event_timestamp in cursor:
+                yield user_id, user_email, organisation_id, organisation_name, profession_id, profession_name, grade_id, grade_name, event_timestamp
+
 def get_learner_details_around_date(learner_id, date):
     interval = '2 years'
 

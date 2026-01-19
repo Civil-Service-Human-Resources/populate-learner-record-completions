@@ -2,12 +2,13 @@ import modules.learnerRecord.LearnerRecordDAO as LearnerRecordDAO
 import pickle
 import modules.learningCatalogue.LearningCatalogueDAO as LearningCatalogueDAO
 import modules.csrs.CsrsService as CsrsService
+import modules.reporting.ReportingDAO as ReportingDAO
 import os
 import sys
 
 # Define the date range:
-start_date = '2022-01-01 00:00:00'
-end_date = '2026-01-15 23:59:59'
+start_date = '2022-01-01T00:00:00'
+end_date = '2026-01-15T23:59:59'
 
 def run():
     arguments = sys.argv[1:]
@@ -23,7 +24,10 @@ def run():
 
     save_courses()
     save_organisations()
-    save_last_mandatory_module_completions()
+    save_grades()
+    last_mandatory_module_completions = save_last_mandatory_module_completions()
+    save_learner_completions_from_reporting([record[0] for record in last_mandatory_module_completions])
+    
 
 def save_courses():
     courses = LearningCatalogueDAO.get_all_courses()
@@ -44,5 +48,13 @@ def save_last_mandatory_module_completions():
     last_mandatory_module_completions = LearnerRecordDAO.get_last_mandatory_module_completions(start_date, end_date)
     pickle.dump(last_mandatory_module_completions, open("/app-data/last_mandatory_module_completions.pkl", "wb"))
     print(f"Saved {len(last_mandatory_module_completions)} module completions")
+    return last_mandatory_module_completions
+
+def save_learner_completions_from_reporting(learner_ids):
+    completions = list(ReportingDAO.get_completions_for_learners(learner_ids, start_date, end_date))
+    pickle.dump(completions, open("/app-data/reporting_completions.pkl", "wb"))
+    print(f"Saved {len(completions)} learner completions from reporting")
+    return completions
+
 
 run()

@@ -1,15 +1,18 @@
 
-import modules.reporting.ReportingDAO as ReportingDAO
 import modules.csrs.CsrsService as CsrsService
+import modules.reporting.ReportingAppDataDAO as ReportingAppDataDAO
 
 def get_learner_details(user_id: str, completion_date: str):
-  reporting_data = ReportingDAO.get_learner_details_around_date(learner_id=user_id, date=completion_date)
+  reporting_data = ReportingAppDataDAO.get_reporting_data_for_user_and_date(user_id, completion_date)
 
   if reporting_data is not None:
     learner_data = reporting_data
   else:
     csrs_data = CsrsService.get_current_learner_details(user_id)
     learner_data = csrs_data
+
+  if learner_data is None:
+    return None
 
   learner_details = {
     "user_email": learner_data[0],
@@ -27,4 +30,5 @@ def get_learner_details(user_id: str, completion_date: str):
   hierarchy_names.reverse()
   learner_details["organisation_hierarchy"] = " | ".join(hierarchy_names)
 
+  print(learner_details)
   return learner_details
