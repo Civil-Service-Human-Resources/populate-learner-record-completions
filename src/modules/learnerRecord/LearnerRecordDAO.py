@@ -16,10 +16,10 @@ def get_required_module_completions_for_user_and_course(user_id, course_id, star
             result = cursor.fetchall()
             return result
 
-def get_last_mandatory_module_completions(from_date, to_date=datetime.now().strftime("%Y-%m-%dT%H:%M")):
+def get_last_mandatory_module_completions(from_date, to_date):
     with MySQLConnection.get_connection() as connection:
         with connection.cursor() as cursor:
-            query = """select mr.user_id, ou.code, mr.course_id, max(mr.completion_date)as last_completion_date, mr.created_at from learner_record.module_record mr
+            query = """select mr.user_id, ou.code, mr.course_id, max(mr.completion_date) as last_completion_date, mr.created_at from learner_record.module_record mr
                 join csrs.`identity` i on i.uid = mr.user_id
                 join csrs.civil_servant cs on cs.identity_id = i.id
                 join csrs.organisational_unit ou on ou.id = cs.organisational_unit_id

@@ -7,8 +7,8 @@ import os
 import sys
 
 # Define the date range:
-start_date = '2022-01-01T00:00:00'
-end_date = '2026-01-15T23:59:59'
+start_date = '2025-01-01T00:00:00'
+end_date = '2025-12-31T23:59:59'
 
 def run():
     arguments = sys.argv[1:]
