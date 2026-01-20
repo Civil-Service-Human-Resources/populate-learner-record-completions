@@ -50,7 +50,7 @@ def run():
             logging.debug(f" - Course with id {course_id} not found. Skipping to next record.")
             continue
 
-        audience = AudienceService.get_audience(learner_details, course_id)
+        audience = AudienceService.get_audience_for_organisation(course["audiences"], learner_details["organisation_id"])
         logging.debug(f" - Audience for user: {audience if audience else 'Not Found'}")
 
         required_by = None if (audience is None or "requiredBy" not in audience or audience["requiredBy"] is None) else audience["requiredBy"]

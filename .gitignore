@@ -6,3 +6,4 @@ config/config-perf.json
 config/config.json
 .DS_Store
 archive/
+.pytest_cache/

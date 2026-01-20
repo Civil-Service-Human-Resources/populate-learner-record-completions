@@ -1,5 +1,6 @@
 from datetime import datetime
 import modules.database.MySQLConnection as MySQLConnection
+from uuid import uuid4
 
 def get_required_module_completions_for_user_and_course(user_id, course_id, starting_date, ending_date=datetime.now().strftime("%Y-%m-%d %H:%M")):
     with MySQLConnection.get_connection() as connection:
@@ -52,12 +53,18 @@ def insert_learner_record_events(rows):
                     resource_id = row["resource_id"]
                     event_timestamp = row["event_timestamp"]
 
+                    learner_records_entry = get_learner_records_entry_for_user_and_course(learner_id, resource_id)
+
+                    if learner_records_entry is None:
+                        learner_records_entry_id = insert_learner_records_entry_for_user_and_course(learner_id, resource_id)
+                    else:
+                        learner_records_entry_id = learner_records_entry[0]
+
                     sql_query = """insert into learner_record.learner_record_events 
                         (learner_record_id, learner_record_event_type, learner_record_event_source, event_timestamp)
-                        select lr.id,4,1,%s from learner_record.learner_records lr 
-                        where lr.learner_id = %s and lr.resource_id = %s;"""
+                        values (%s, 4, 1, %s);"""
                     
-                    cursor.execute(sql_query, (event_timestamp, learner_id, resource_id,))
+                    cursor.execute(sql_query, (learner_records_entry_id, event_timestamp,))
                     connection.commit()
                     applied_successfully = True
                 except:
@@ -125,3 +132,25 @@ def delete_learner_record_events_by_ids(event_ids):
             cursor.execute(query, event_ids)
             connection.commit()
             return cursor.rowcount
+        
+def get_learner_records_entry_for_user_and_course(user_id, course_id):
+    with MySQLConnection.get_connection() as connection:
+        with connection.cursor() as cursor:
+            query = """select * from learner_record.learner_records lr 
+                where lr.learner_id = %s
+                and lr.resource_id = %s ;"""
+            cursor.execute(query, (user_id, course_id,))
+            result = cursor.fetchone()
+            return result
+        
+def insert_learner_records_entry_for_user_and_course(user_id, course_id):
+    with MySQLConnection.get_connection() as connection:
+        with connection.cursor() as cursor:
+            uid = str(uuid4())
+            query = """INSERT INTO learner_record.learner_records
+                (learner_record_type, learner_record_uid, learner_id, resource_id, is_archived)
+                VALUES(1, %s, %s, %s, 0);"""
+            
+            cursor.execute(query, (uid, user_id, course_id,))
+            connection.commit()
+            return cursor.lastrowid
