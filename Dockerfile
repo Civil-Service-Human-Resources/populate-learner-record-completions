@@ -6,3 +6,4 @@ RUN pip install pandas
 RUN pip install tabulate
 RUN pip install "psycopg[binary]"
 RUN pip install -U pytest
+RUN pip install pytest-mock

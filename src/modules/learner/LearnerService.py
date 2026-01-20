@@ -30,5 +30,4 @@ def get_learner_details(user_id: str, completion_date: str):
   hierarchy_names.reverse()
   learner_details["organisation_hierarchy"] = " | ".join(hierarchy_names)
 
-  print(learner_details)
   return learner_details

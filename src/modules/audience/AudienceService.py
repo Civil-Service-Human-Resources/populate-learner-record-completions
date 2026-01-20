@@ -29,9 +29,7 @@ def get_audience(learner, course_id):
             organisation_hierarchy = CsrsService.get_organisation_hierarchy_by_id(learner["organisation_id"])
             organisation_audiences = []
             for organisation in organisation_hierarchy:
-                print(organisation[2])
                 if organisation[2] in audience["departments"]:
-                    print("In audience: ", organisation[2])
                     organisation_audiences.append(audience)
                     break
 

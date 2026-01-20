@@ -60,3 +60,8 @@ analytics.byCourse:
 
 analytics.html:
 	$(docker) python -m analytics.htmlReport
+
+# Tests
+
+test:
+	$(docker) python -m pytest -v
