@@ -11,11 +11,12 @@ import modules.audience.AudienceService as AudienceService
 import modules.learningCatalogue.LearningCatalogueAppDataDAO as LearningCatalogueAppDataDAO
 import modules.csrs.CsrsAppDataDAO as CsrsAppDataDAO
 import modules.utils.ArrayUtil as ArrayUtil
+import modules.learnerRecord.LearnerRecordAppDataDAO as LearnerRecordAppDataDAO
 
 logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
 
 def run():
-    module_records = pickle.load(open("/app-data/last_mandatory_module_completions.pkl", "rb"))
+    module_records = LearnerRecordAppDataDAO.get_last_mandatory_module_completions()
     logging.debug(f"Loaded {len(module_records)} last module completions.")
 
     courses = LearningCatalogueAppDataDAO.get_all_courses()
