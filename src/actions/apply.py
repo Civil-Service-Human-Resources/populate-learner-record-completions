@@ -5,6 +5,8 @@ import pickle
 import modules.reporting.ReportingDAO as ReportingDAO
 import uuid
 import logging
+import math
+import os
 
 logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
 
@@ -28,27 +30,34 @@ def run():
 	course_completion_events_rows = []
 
 	logging.debug("Preparing course completion events...")
-	for item in plan_data:
-		logging.debug(f"Processing plan item for user_id: {item['user_id']}, course_id: {item['course_id']}")
-		
-		if "learner_details" in item:
-			course_completion_events_rows.append({
-				"external_id": str(uuid.uuid4()),
-				"user_id": item["user_id"],
-				"user_email": item["learner_details"]["user_email"],
-				"course_id": item["course_id"],
-				"course_title": next((c["title"] for c in courses if c["id"] == item["course_id"]), None),
-				"event_timestamp": item["completion_timestamp"],
-				"organisation_id": item["learner_details"]["organisation_id"],
-				"profession_id": item["learner_details"]["profession_id"],
-				"grade_id": item["learner_details"]["grade_id"],
-				"grade_name": item["learner_details"]["grade_name"],
-				"profession_name": item["learner_details"]["profession_name"],
-				"organisation_name": item["learner_details"]["organisation_name"]
-			})
-			logging.debug(f"  - Added course completion event for user_id: {item['user_id']}, course_id: {item['course_id']}")
-		else:
-			logging.warning(f"- Learner details not found for user_id: {item['user_id']}")
+	for index, item in enumerate(plan_data):
+		_ = os.system("clear")
+		percentage_completed = str(math.floor((index/len(plan_data))*100))
+		print(f"Processing {index+1} of {len(plan_data)} ({percentage_completed}%)")
+
+		try:
+			logging.debug(f"Processing plan item for user_id: {item['user_id']}, course_id: {item['course_id']}")
+			
+			if "learner_details" in item:
+				course_completion_events_rows.append({
+					"external_id": str(uuid.uuid4()),
+					"user_id": item["user_id"],
+					"user_email": item["learner_details"]["user_email"],
+					"course_id": item["course_id"],
+					"course_title": next((c["title"] for c in courses if c["id"] == item["course_id"]), None),
+					"event_timestamp": item["completion_timestamp"],
+					"organisation_id": item["learner_details"]["organisation_id"],
+					"profession_id": item["learner_details"]["profession_id"],
+					"grade_id": item["learner_details"]["grade_id"],
+					"grade_name": item["learner_details"]["grade_name"],
+					"profession_name": item["learner_details"]["profession_name"],
+					"organisation_name": item["learner_details"]["organisation_name"]
+				})
+				logging.debug(f"  - Added course completion event for user_id: {item['user_id']}, course_id: {item['course_id']}")
+			else:
+				logging.warning(f"- Learner details not found for user_id: {item['user_id']}")
+		except Exception as e:
+			logging.debug(f"Applying failed for item: {item}: {e}")
 
 	ReportingDAO.insert_course_completion_events(course_completion_events_rows)
 	logging.info(f"Inserted {len(course_completion_events_rows)} course completion events.")
