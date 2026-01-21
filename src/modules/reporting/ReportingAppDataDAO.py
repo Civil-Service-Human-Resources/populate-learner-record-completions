@@ -19,7 +19,7 @@ def get_reporting_data_for_user_and_date(user_id: str, date: str):
     if user_completions.empty:
         return None
 
-    df_sorted = (user_completions.assign(distance=(df["event_timestamp"] - pd.Timestamp(date)).abs())
+    df_sorted = (user_completions.assign(distance=(user_completions["event_timestamp"] - pd.Timestamp(date)).abs())
         .sort_values("distance")
         .drop(columns="distance")
     )
