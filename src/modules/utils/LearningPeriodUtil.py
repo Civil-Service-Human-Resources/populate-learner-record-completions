@@ -18,11 +18,21 @@ def get_learning_period_for_date(target_date: str, required_by: str = None, freq
         }
 
     frequency_period = get_years_and_months_from_frequency(frequency)
-    while required_by_date < target_date:
-        required_by_date += relativedelta(years=frequency_period["years"], months=frequency_period["months"])
 
-    required_by_date += relativedelta(minutes=1)
-    learning_period_start_date = required_by_date - relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+    if required_by_date > target_date:
+        while required_by_date > target_date + relativedelta(minutes=1):
+            required_by_date -= relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+
+        return {
+            "start_date": required_by_date,
+            "end_date": required_by_date + relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+        }
+    else:
+        while required_by_date < target_date:
+            required_by_date += relativedelta(years=frequency_period["years"], months=frequency_period["months"])
+
+        required_by_date += relativedelta(minutes=1)
+        learning_period_start_date = required_by_date - relativedelta(years=frequency_period["years"], months=frequency_period["months"])
 
     return {
         "start_date": learning_period_start_date,

@@ -68,7 +68,7 @@ def save_mandatory_module_completions_for_users(learner_ids):
     print(f"Saved {len(module_completions)} module completions from learner record")
 
 def save_learner_record_course_completion_events(learner_ids):
-    completion_events = LearnerRecordDAO.get_learner_record_course_completion_events_for_users(learner_ids, start_date, end_date)
+    completion_events = LearnerRecordDAO.get_learner_record_course_completion_events_for_users(learner_ids)
     pickle.dump(completion_events, open("/app-data/learner_record_course_completion_events.pkl", "wb"))
     print(f"Saved {len(completion_events)} course completion events")
 

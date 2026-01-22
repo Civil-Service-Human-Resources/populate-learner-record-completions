@@ -14,7 +14,7 @@ import modules.learnerRecord.LearnerRecordService as LearnerRecordService
 import traceback
 import pandas as pd
 
-logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/debug4.log', level=logging.DEBUG)
 
 def run():
     script_start_time = datetime.now()
