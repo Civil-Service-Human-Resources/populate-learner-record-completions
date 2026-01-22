@@ -2,6 +2,83 @@ from datetime import datetime
 import modules.database.MySQLConnection as MySQLConnection
 from uuid import uuid4
 
+def get_required_module_completions(user_ids):
+    with MySQLConnection.get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                CREATE TEMPORARY TABLE learner_record.tmp_user_ids (
+                    user_id VARCHAR(255) PRIMARY KEY
+                ) ENGINE=InnoDB
+            """)
+
+            insert_sql = "INSERT INTO learner_record.tmp_user_ids (user_id) VALUES (%s)"
+            cursor.executemany(
+                insert_sql,
+                [(uid,) for uid in user_ids]
+            )
+
+            connection.commit()
+
+            select_sql = """
+                SELECT
+                        mr.user_id,
+                        mr.course_id,
+                        mr.module_id,
+                        mr.completion_date
+                    FROM learner_record.module_record mr
+                    JOIN learner_record.tmp_user_ids u ON u.user_id = mr.user_id
+                    WHERE mr.optional = 0
+                    AND mr.state = 'COMPLETED'
+                """
+
+            cursor.execute(select_sql)
+
+            rows = []
+            while True:
+                results = cursor.fetchmany(1000)
+                if not results:
+                    break
+                rows += results
+            
+            return rows
+        
+def get_learner_record_course_completion_events_for_users(user_ids):
+    with MySQLConnection.get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                CREATE TEMPORARY TABLE learner_record.tmp_user_ids (
+                    user_id VARCHAR(255) PRIMARY KEY
+                ) ENGINE=InnoDB
+            """)
+
+            insert_sql = "INSERT INTO learner_record.tmp_user_ids (user_id) VALUES (%s)"
+            cursor.executemany(
+                insert_sql,
+                [(uid,) for uid in user_ids]
+            )
+
+            connection.commit()
+
+            select_sql = """
+                    select lr.learner_id, lr.resource_id, lre.event_timestamp from learner_record.learner_record_events lre 
+                        join learner_record.learner_records lr on lr.id = lre.learner_record_id
+                        JOIN learner_record.tmp_user_ids u ON u.user_id = lr.learner_id
+                        where lre.learner_record_event_type = 4
+                """
+
+            cursor.execute(select_sql)
+
+            rows = []
+            while True:
+                results = cursor.fetchmany(1000)
+                print(f"Found {len(results)} results.")
+                if not results:
+                    print("No more results.")
+                    break
+                rows += results
+            
+            return rows
+        
 def get_required_module_completions_for_user_and_course(user_id, course_id, starting_date, ending_date=datetime.now().strftime("%Y-%m-%d %H:%M")):
     with MySQLConnection.get_connection() as connection:
         with connection.cursor() as cursor:

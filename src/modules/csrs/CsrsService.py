@@ -40,11 +40,19 @@ def get_grade_by_id(grade_id: int):
     grade = next((g for g in all_grades if g[0] == grade_id), None)
     return grade
 
-def get_current_learner_details(user_id: str):
-    return CsrsDAO.get_current_learner_details(user_id)
+def get_current_learner_details(all_learners_df, user_id: str):
+    try:
+        filtered_df = all_learners_df.loc[[(user_id)]]
+        return filtered_df.iloc[0]
+    except:
+        return None
+    
 
 def get_all_organisations():
     return CsrsDAO.get_all_organisations()
 
 def get_all_grades():
     return CsrsDAO.get_all_grades()
+
+def get_learners_details(learner_ids):
+    return CsrsDAO.get_learners_details(learner_ids)

@@ -1,19 +1,7 @@
 import pickle
 import pandas as pd
 
-def get_reporting_data_for_user_and_date(user_id: str, date: str):
-    all_completions = get_reporting_data()
-    df = pd.DataFrame(all_completions, columns=[
-        "user_id",
-        "user_email",
-        "organisation_id",
-        "organisation_name",
-        "profession_id",
-        "profession_name",
-        "grade_id",
-        "grade_name",
-        "event_timestamp"
-    ])
+def get_reporting_data_for_user_and_date(df, user_id: str, date: str):
     user_completions = df[df['user_id'] == user_id]
 
     if user_completions.empty:

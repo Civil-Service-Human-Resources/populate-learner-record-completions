@@ -7,6 +7,7 @@ import uuid
 import logging
 import math
 import os
+import traceback
 
 logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
 
@@ -57,7 +58,8 @@ def run():
 			else:
 				logging.warning(f"- Learner details not found for user_id: {item['user_id']}")
 		except Exception as e:
-			logging.debug(f"Applying failed for item: {item}: {e}")
+			logging.error(f"- Processing completion failed: {e}")
+			logging.error(traceback.format_exc())
 
 	ReportingDAO.insert_course_completion_events(course_completion_events_rows)
 	logging.info(f"Inserted {len(course_completion_events_rows)} course completion events.")

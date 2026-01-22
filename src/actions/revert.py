@@ -3,7 +3,7 @@ import modules.learnerRecord.LearnerRecordDAO as LearnerRecordDAO
 import modules.reporting.ReportingDAO as ReportingDAO
 import logging
 
-logging.basicConfig(filename='/logs/debug.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/debug.log', level=logging.ERROR)
 
 apply_data = json.load(open("/app-data/apply.json", "r"))
 

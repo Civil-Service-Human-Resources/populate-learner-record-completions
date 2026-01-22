@@ -13,3 +13,7 @@ def save_grades(grades):
 def get_all_grades():
     grades = pickle.load(open("/app-data/grades.pkl", "rb"))
     return grades
+
+def get_all_learner_details():
+    details = pickle.load(open("/app-data/csrs_learners_details.pkl", "rb"))
+    return details
