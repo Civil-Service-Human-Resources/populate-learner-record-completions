@@ -6,7 +6,6 @@ import modules.reporting.ReportingDAO as ReportingDAO
 import os
 import sys
 
-print("Example dates: 2025-01-01T00:00:00")
 start_date = "2022-01-01T00:00:00"
 end_date = "2022-12-31T00:00:00"
 

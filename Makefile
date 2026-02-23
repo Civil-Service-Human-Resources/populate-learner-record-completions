@@ -4,6 +4,9 @@ docker := docker compose exec app
 setup:
 	docker compose up -d --build
 
+setup-app-only:
+	docker compose up -d --build app
+
 ## Environment
 
 env-set-local:

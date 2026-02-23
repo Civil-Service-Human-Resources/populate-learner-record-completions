@@ -102,14 +102,11 @@ def run():
 
             module_record_for_user_and_course = LearnerRecordService.get_mandatory_module_completions_for_user_and_course(module_completions_df, user_id, course_id, learning_period_info['start_date'].strftime("%Y-%m-%d %H:%M"), learning_period_info['end_date'].strftime("%Y-%m-%d %H:%M"))
             module_record_mandatory_module_ids = module_record_for_user_and_course["module_id"].tolist()
-            logging.debug(f" - User {user_id} completed {len(module_record_mandatory_module_ids)} modules for course with ID {course_id}")
+            logging.debug(f" - Completed modules by user {user_id}: {module_record_mandatory_module_ids}")
 
-            if mandatory_module_count != len(module_record_mandatory_module_ids):
+            all_mandatory_modules_completed = set(mandatory_module_ids) <= set(module_record_mandatory_module_ids)
+            if not all_mandatory_modules_completed:
                 logging.debug(f" - Not all mandatory modules completed for user_id {user_id} in course_id {course_id}.")
-                continue
-
-            if not ArrayUtil.compare_string_arrays(mandatory_module_ids, module_record_mandatory_module_ids):
-                logging.debug(f" - Module IDs in course and module record are different: Module IDs in course: {mandatory_module_ids}, Module record: {module_record_mandatory_module_ids}")
                 continue
 
             logging.debug(f" - All mandatory modules completed for user_id {user_id} in course_id {course_id}.")
