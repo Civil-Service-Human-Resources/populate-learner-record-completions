@@ -1,11 +1,10 @@
-
 import modules.csrs.CsrsService as CsrsService
 import pandas as pd
-
 
 def get_learner_details(reporting_data, csrs_data_df, user_id: str, completion_date: str):
   user_reporting_data = None
 
+  
   try:
     filtered_df = reporting_data.loc[[(user_id)]]
     user_reporting_data = (filtered_df.assign(distance=(filtered_df["event_timestamp"] - pd.Timestamp(completion_date)).abs())
@@ -14,6 +13,7 @@ def get_learner_details(reporting_data, csrs_data_df, user_id: str, completion_d
       )
   except:
     user_reporting_data = None
+
 
   if user_reporting_data is not None:
     learner_data = user_reporting_data.iloc[0]
@@ -34,7 +34,6 @@ def get_learner_details(reporting_data, csrs_data_df, user_id: str, completion_d
     "grade_name": learner_data["grade_name"]
   }
 
-  organisation = CsrsService.get_organisation_by_id(learner_details["organisation_id"])
   organisation_hierarchy = CsrsService.get_organisation_hierarchy_by_id(learner_details["organisation_id"])
   hierarchy_names = [org[4] for org in organisation_hierarchy]
   hierarchy_names.reverse()
